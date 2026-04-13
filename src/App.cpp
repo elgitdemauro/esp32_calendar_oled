@@ -59,8 +59,8 @@ void App::render() {
     return;
   }
 
-  if (!isClockReady()) {
-    display_.renderBoot("WiFi listo", "Sin hora NTP");
+  if (!isClockReady() || !calendarEverLoaded_) {
+    display_.renderBoot("WiFi listo", "Cargando agenda...");
     return;
   }
 
@@ -252,11 +252,13 @@ void App::applyFetchedCalendarData() {
     memcpy(events_, fetchedEvents_, sizeof(events_));
     eventCount_ = fetchedEventCount_;
     staleData_ = false;
+    calendarEverLoaded_ = true;
     statusLine_ = eventCount_ > 0 ? "" : "Sin reuniones hoy";
     calendarDataReady_ = false;
     syncSelectedEvent(selectionLocked_);
   } else if (calendarFetchFailed_) {
     staleData_ = true;
+    calendarEverLoaded_ = true;
     statusLine_ = fetchError_.length() > 0 ? fetchError_ : "Error calendario";
   }
 

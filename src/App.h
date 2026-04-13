@@ -34,6 +34,7 @@ class App {
 
   bool displayReady_ = false;
   bool clockReady_ = false;
+  bool calendarEverLoaded_ = false;
   bool staleData_ = false;
   bool blinkState_ = true;
   String statusLine_ = "Iniciando";
