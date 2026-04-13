@@ -71,7 +71,7 @@ void App::render() {
   }
 
   display_.renderSchedule(events_, eventCount_, currentEpoch(), selectedEventIndex_,
-                          blinkState_, staleData_);
+                          blinkState_, staleData_, headerFocused_);
 }
 
 void App::ensureWiFi() {
@@ -159,14 +159,21 @@ void App::updateButtons() {
         ++detailScrollOffset_;
       }
     } else if (viewMode_ == ViewMode::kSchedule && eventCount_ > 0) {
-      if (selectedEventIndex_ < 0) {
+      if (headerFocused_) {
+        headerFocused_ = false;
         selectedEventIndex_ = 0;
+        selectionLocked_ = true;
+      } else if (selectedEventIndex_ < 0) {
+        selectedEventIndex_ = 0;
+        selectionLocked_ = true;
       } else if (selectedEventIndex_ < static_cast<int>(eventCount_ - 1)) {
         ++selectedEventIndex_;
+        selectionLocked_ = true;
       } else {
-        selectedEventIndex_ = 0;
+        headerFocused_ = true;
+        selectedEventIndex_ = -1;
+        selectionLocked_ = false;
       }
-      selectionLocked_ = true;
     }
   }
 
@@ -210,9 +217,14 @@ void App::syncSelectedEvent(bool preserveSelection) {
     selectedEventIndex_ = -1;
     detailScrollOffset_ = 0;
     selectionLocked_ = false;
+    headerFocused_ = false;
     if (viewMode_ == ViewMode::kDetail) {
       viewMode_ = ViewMode::kSchedule;
     }
+    return;
+  }
+
+  if (headerFocused_) {
     return;
   }
 

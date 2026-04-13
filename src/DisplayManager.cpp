@@ -29,9 +29,9 @@ void DisplayManager::renderBoot(const char* line1, const char* line2) {
 
 void DisplayManager::renderSchedule(const CalendarEvent* events, size_t count,
                                     time_t nowEpoch, int selectedEventIndex, bool blink,
-                                    bool staleData) {
+                                    bool staleData, bool headerView) {
   display_.clearBuffer();
-  renderHeader(nowEpoch, staleData);
+  renderHeader(nowEpoch, staleData, headerView);
   renderNowLine(nowEpoch, blink);
 
   if (count == 0) {
@@ -41,9 +41,17 @@ void DisplayManager::renderSchedule(const CalendarEvent* events, size_t count,
     return;
   }
 
-  int anchorIndex = selectedEventIndex;
-  if (anchorIndex < 0 || anchorIndex >= static_cast<int>(count)) {
-    anchorIndex = findAnchorIndex(events, count, nowEpoch);
+  int selectedIndex;
+  int anchorIndex;
+  if (headerView) {
+    anchorIndex = 2;
+    selectedIndex = -1;
+  } else {
+    selectedIndex = selectedEventIndex;
+    if (selectedIndex < 0 || selectedIndex >= static_cast<int>(count)) {
+      selectedIndex = findAnchorIndex(events, count, nowEpoch);
+    }
+    anchorIndex = max(selectedIndex, 2);
   }
 
   const int centerRow = 2;
@@ -55,7 +63,7 @@ void DisplayManager::renderSchedule(const CalendarEvent* events, size_t count,
 
     const int slot = centerRow + offset;
     const int rowY = Config::HEADER_HEIGHT + (slot * Config::ROW_HEIGHT) + 4;
-    drawEventRow(rowY, events[eventIndex], nowEpoch, offset == 0);
+    drawEventRow(rowY, events[eventIndex], nowEpoch, !headerView && eventIndex == selectedIndex);
   }
 
   display_.sendBuffer();
@@ -75,17 +83,26 @@ void DisplayManager::renderEventDetail(const CalendarEvent& event, uint8_t scrol
   display_.sendBuffer();
 }
 
-void DisplayManager::renderHeader(time_t nowEpoch, bool staleData) {
+void DisplayManager::renderHeader(time_t nowEpoch, bool staleData, bool highlight) {
   struct tm timeInfo;
   localtime_r(&nowEpoch, &timeInfo);
 
   char dateBuffer[6];
   snprintf(dateBuffer, sizeof(dateBuffer), "%02d/%02d", timeInfo.tm_mday, timeInfo.tm_mon + 1);
 
+  if (highlight) {
+    display_.drawBox(0, 0, 128, Config::HEADER_HEIGHT);
+    display_.setDrawColor(0);
+  }
+
   drawText(0, 0, String(dateBuffer));
   drawText(39, 0, formatDayNameEs(nowEpoch));
   if (staleData) {
     drawText(92, 0, "CACHE");
+  }
+
+  if (highlight) {
+    display_.setDrawColor(1);
   }
 }
 

@@ -43,6 +43,7 @@ class App {
   int selectedEventIndex_ = -1;
   uint8_t detailScrollOffset_ = 0;
   bool selectionLocked_ = false;
+  bool headerFocused_ = false;
   bool nextPressed_ = false;
   bool detailPressed_ = false;
   bool backPressed_ = false;

@@ -11,7 +11,8 @@ class DisplayManager {
   bool begin();
   void renderBoot(const char* line1, const char* line2);
   void renderSchedule(const CalendarEvent* events, size_t count, time_t nowEpoch,
-                      int selectedEventIndex, bool blink, bool staleData);
+                      int selectedEventIndex, bool blink, bool staleData,
+                      bool headerView = false);
   void renderEventDetail(const CalendarEvent& event, uint8_t scrollOffset, bool staleData);
   int currentAnchorIndex(const CalendarEvent* events, size_t count, time_t nowEpoch) const;
   uint8_t detailMaxScroll(const CalendarEvent& event, uint8_t maxCharsPerLine,
@@ -20,7 +21,7 @@ class DisplayManager {
  private:
   U8G2_SSD1306_128X64_NONAME_F_HW_I2C display_;
 
-  void renderHeader(time_t nowEpoch, bool staleData);
+  void renderHeader(time_t nowEpoch, bool staleData, bool highlight = false);
   void renderDetailHeader(const CalendarEvent& event, bool staleData);
   void renderNowLine(time_t nowEpoch, bool blink);
   int findAnchorIndex(const CalendarEvent* events, size_t count, time_t nowEpoch) const;
