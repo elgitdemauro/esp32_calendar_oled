@@ -1,0 +1,20 @@
+# Credenciales - NO subir al repositorio
+src/Secrets.h
+
+# Arduino / PlatformIO
+.pio/
+.pioenvs/
+.piolibdeps/
+build/
+*.o
+*.d
+
+# IDEs
+.vscode/
+.idea/
+*.suo
+*.user
+
+# OS
+.DS_Store
+Thumbs.db
